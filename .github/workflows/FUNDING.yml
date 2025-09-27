@@ -1,56 +1,23 @@
-name: Deploy Portfolio to AWS S3
+name: Portfolio Deployment
 
-# Yeh workflow 'main' branch ke push hone par chalta hai.
 on:
   push:
     branches:
-      # Agar aapki branch 'main' nahi, 'master' hai toh ise master kar den.
-      - main
-  # Manual run ki ijazat
-  workflow_dispatch:
+    - main 
 
 jobs:
-  deploy:
-    # Umeed hai aapka S3 bucket 'eu-north-1' mein hai.
+  build-and-deploy:
     runs-on: ubuntu-latest
-    
-  name: Deploy Portfolio to AWS S3
-
-# Yeh workflow 'main' branch ke push hone par chalta hai.
-on:
-  push:
-    branches:
-      # Agar aapki default branch 'main' hai toh yahi rakhen.
-      # Agar 'master' hai toh is line ko - master kar den.
-      - main
-  # Ise aap GitHub Actions tab se manually bhi chala sakte hain.
-  workflow_dispatch:
-
-jobs:
-  deploy:
-    # Aapka S3 region: eu-north-1
-    runs-on: ubuntu-latest
-    
-    # Permissions zaroori hain.
-    permissions:
-      contents: read
-      
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+    - name: Checkout
+      uses: actions/checkout@v1
 
-      # Step 1: AWS credentials set karna
-      - name: Step 1: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-north-1 
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
 
-      # Step 2: Files ko S3 bucket mein sync karna.
-      - name: Step 2: Deploy to S3 Bucket (roohan-baloch)
-        run: |
-          echo "Starting deployment to S3 bucket: roohan-baloch in eu-north-1"
-          # S3 sync command: current directory (.) ke files S3 bucket par upload honge.
-          aws s3 sync . s3://roohan-baloch --delete --exclude ".git/*"
-          echo "Deployment successful."
+    - name: Deploy static site to S3 bucket
+      run: aws s3 sync . s3://roohan-baloch --delete
