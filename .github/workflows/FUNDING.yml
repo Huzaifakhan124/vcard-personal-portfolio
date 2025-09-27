@@ -1,37 +1,21 @@
 name: Deploy Portfolio to AWS S3
-
-# Yeh workflow tab run hoga jab 'main' branch par naya code push hoga
 on:
   push:
     branches:
-      - main
-  # Agar aap chahte hain ki yeh manually bhi run ho sake
+      - main # Ya master, jo bhi aapki branch ka naam hai
   workflow_dispatch:
-
 jobs:
   deploy:
-    # Konsa operating system use karna hai (Ubuntu zyadatar chalta hai)
     runs-on: ubuntu-latest
-
     steps:
-      # Step 1: GitHub se code ko download karna
       - name: Checkout Code
         uses: actions/checkout@v4
-
-      # Step 2: AWS credentials set karna (Inko aapne GitHub Secrets mein save kiya hai)
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          # Yahan woh Region likhen jahan aapka S3 bucket bana hai (Maslan: 'ap-south-1' Mumbai ke liye)
-          aws-region: eu-north-1 
-
-      # Step 3: Files ko S3 bucket mein upload karna
+          aws-region: eu-north-1
       - name: Deploy to S3 Bucket
         run: |
-          # Dhyan dein: 's3://' ke baad apne S3 bucket ka sahi naam likhen
-          aws s3 sync . s3://roohan-baloch --delete 
-        env:
-          # Agar aapko region dynamically set karna hai toh yeh bhi use kar sakte hain
-          AWS_REGION: eu-north-1
+          aws s3 sync . s3://roohan-baloch --delete
