@@ -1,39 +1,56 @@
-:Deploy Portfolio to AWS S3
+name: Deploy Portfolio to AWS S3
 
-# Jab bhi 'main' branch par naya code push hoga, yeh workflow chalega.
-on:name
+# Yeh workflow 'main' branch ke push hone par chalta hai.
+on:
   push:
     branches:
+      # Agar aapki branch 'main' nahi, 'master' hai toh ise master kar den.
+      - main
+  # Manual run ki ijazat
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    # Umeed hai aapka S3 bucket 'eu-north-1' mein hai.
+    runs-on: ubuntu-latest
+    
+  name: Deploy Portfolio to AWS S3
+
+# Yeh workflow 'main' branch ke push hone par chalta hai.
+on:
+  push:
+    branches:
+      # Agar aapki default branch 'main' hai toh yahi rakhen.
+      # Agar 'master' hai toh is line ko - master kar den.
       - main
   # Ise aap GitHub Actions tab se manually bhi chala sakte hain.
   workflow_dispatch:
 
 jobs:
   deploy:
+    # Aapka S3 region: eu-north-1
     runs-on: ubuntu-latest
     
-    # Permissions zaroori hain agar aap OIDC use karte hain, lekin secrets ke liye bhi behtar hain.
+    # Permissions zaroori hain.
     permissions:
       contents: read
       
     steps:
-      - name: Code Repository Check out
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      # Step 1: AWS Credentials ko GitHub Secrets se uthana.
-      - name: Configure AWS Credentials
+      # Step 1: AWS credentials set karna
+      - name: Step 1: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          # Yeh keys aapko GitHub Secrets (Settings > Secrets > Actions) mein save karni hain.
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          # Yahan woh AWS Region den jahan aapka S3 Bucket bana hai (e.g., ap-south-1 for Mumbai).
-          aws-region: us-east-1 
+          aws-region: eu-north-1 
 
-      # Step 2: Files ko S3 Bucket mein sync karna.
-      - name: Deploy files to S3 Bucket
+      # Step 2: Files ko S3 bucket mein sync karna.
+      - name: Step 2: Deploy to S3 Bucket (roohan-baloch)
         run: |
-          echo "Deploying files to S3..."
-          # Zaroori Badlav: s3:// ke baad apne S3 Bucket ka ASLI NAAM likhen.
+          echo "Starting deployment to S3 bucket: roohan-baloch in eu-north-1"
+          # S3 sync command: current directory (.) ke files S3 bucket par upload honge.
           aws s3 sync . s3://roohan-baloch --delete --exclude ".git/*"
-          echo "Deployment complete."
+          echo "Deployment successful."
