@@ -4,7 +4,7 @@ name: Deploy Portfolio to AWS S3
 on:
   push:
     branches:
-      - main
+      - master
   # Agar aap chahte hain ki yeh manually bhi run ho sake
   workflow_dispatch:
 
