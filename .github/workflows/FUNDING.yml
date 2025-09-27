@@ -1,21 +1,39 @@
-name: Deploy Portfolio to AWS S3
-on:
+:Deploy Portfolio to AWS S3
+
+# Jab bhi 'main' branch par naya code push hoga, yeh workflow chalega.
+on:name
   push:
     branches:
-      - main # Ya master, jo bhi aapki branch ka naam hai
+      - main
+  # Ise aap GitHub Actions tab se manually bhi chala sakte hain.
   workflow_dispatch:
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    
+    # Permissions zaroori hain agar aap OIDC use karte hain, lekin secrets ke liye bhi behtar hain.
+    permissions:
+      contents: read
+      
     steps:
-      - name: Checkout Code
+      - name: Code Repository Check out
         uses: actions/checkout@v4
+
+      # Step 1: AWS Credentials ko GitHub Secrets se uthana.
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
+          # Yeh keys aapko GitHub Secrets (Settings > Secrets > Actions) mein save karni hain.
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-north-1
-      - name: Deploy to S3 Bucket
+          # Yahan woh AWS Region den jahan aapka S3 Bucket bana hai (e.g., ap-south-1 for Mumbai).
+          aws-region: us-east-1 
+
+      # Step 2: Files ko S3 Bucket mein sync karna.
+      - name: Deploy files to S3 Bucket
         run: |
-          aws s3 sync . s3://roohan-baloch --delete
+          echo "Deploying files to S3..."
+          # Zaroori Badlav: s3:// ke baad apne S3 Bucket ka ASLI NAAM likhen.
+          aws s3 sync . s3://roohan-baloch --delete --exclude ".git/*"
+          echo "Deployment complete."
