@@ -25,7 +25,7 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           # Yahan woh Region likhen jahan aapka S3 bucket bana hai (Maslan: 'ap-south-1' Mumbai ke liye)
-          aws-region: us-east-1 
+          aws-region: eu-north-1 
 
       # Step 3: Files ko S3 bucket mein upload karna
       - name: Deploy to S3 Bucket
@@ -34,4 +34,4 @@ jobs:
           aws s3 sync . s3://roohan-baloch --delete 
         env:
           # Agar aapko region dynamically set karna hai toh yeh bhi use kar sakte hain
-          AWS_REGION: us-east-1
+          AWS_REGION: eu-north-1
